@@ -1,23 +1,19 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER app
-WORKDIR /app
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+# Stage 1: Build shared library
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS shared
 WORKDIR /src
-COPY ["ExchangeRates.Fetcher/ExchangeRates.Fetcher.csproj", "ExchangeRates.Fetcher/"]
-RUN dotnet restore "./ExchangeRates.Fetcher/ExchangeRates.Fetcher.csproj"
-COPY . .
-WORKDIR "/src/ExchangeRates.Fetcher"
-RUN dotnet build "./ExchangeRates.Fetcher.csproj" -c $BUILD_CONFIGURATION -o /app/build
+COPY ./ExchangeRates.Shared ./ExchangeRates.Shared
+RUN dotnet build ./ExchangeRates.Shared/ExchangeRates.Shared.csproj -c Release
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ExchangeRates.Fetcher.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+# Stage 2: Build and publish Fetcher
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY ./ExchangeRates.Fetcher ./ExchangeRates.Fetcher
+COPY --from=shared /src/ExchangeRates.Shared ./ExchangeRates.Shared
+RUN dotnet restore ./ExchangeRates.Fetcher/ExchangeRates.Fetcher.csproj
+RUN dotnet publish ./ExchangeRates.Fetcher/ExchangeRates.Fetcher.csproj -c Release -o /out
+
+# Stage 3: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /out .
 ENTRYPOINT ["dotnet", "ExchangeRates.Fetcher.dll"]
