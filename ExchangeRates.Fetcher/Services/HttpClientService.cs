@@ -8,18 +8,19 @@ namespace ExchangeRates.Fetcher.Services
 {
     internal class HttpClientService : IHttpClientService
     {
-        public HttpClientService(HttpClient httpClient, IExternalApiOptions externalApiOptions)
+        public HttpClientService(IHttpClientFactory httpClientFactory, IExternalApiOptions externalApiOptions)
         {
-            _httpClient = httpClient;
-            _externalApiUrl = externalApiOptions.Url;
+            _httpClient = httpClientFactory.CreateClient();
+            _externalApiOptions = externalApiOptions;
         }
 
         private readonly HttpClient _httpClient;
-        private readonly string _externalApiUrl;
+        private readonly IExternalApiOptions _externalApiOptions;
 
         public async Task<IEnumerable<ExchangeRate>> GetExchangeRatesAsync()
         {
-            var response = await _httpClient.GetAsync(_externalApiUrl);
+            _httpClient.DefaultRequestHeaders.Add("apikey", _externalApiOptions.ApiKey);
+            var response = await _httpClient.GetAsync(_externalApiOptions.Url);
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"Failed to fetch exchange rates: {response.StatusCode}");
