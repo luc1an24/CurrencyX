@@ -11,18 +11,17 @@ var builder = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((context, services) =>
     {
-        services.Configure<ExternalApiOptions>(context.Configuration.GetSection("ExternalApi"));
-
-        services.AddTransient<IHttpClientService, HttpClientService>();
-        services.AddTransient<IFetcherService, FetcherService>();
-        services.AddTransient<IExchangeRateRepository, ExchangeRateRepository>();
-
         var connectionStrings = context.Configuration.GetSection("ConnectionStrings");
         services.AddSingleton<IConnectionStrings>(new ConnectionStrings
         {
             Postgres = connectionStrings["Postgres"] ?? "",
             Redis = connectionStrings["Redis"] ?? ""
         });
+        services.Configure<ExternalApiOptions>(context.Configuration.GetSection("ExternalApi"));
+
+        services.AddTransient<IHttpClientService, HttpClientService>();
+        services.AddTransient<IFetcherService, FetcherService>();
+        services.AddTransient<IExchangeRateRepository, ExchangeRateRepository>(); 
     })
     .Build();
 
