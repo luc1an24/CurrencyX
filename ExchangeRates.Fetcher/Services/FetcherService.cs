@@ -2,7 +2,7 @@
 
 namespace ExchangeRates.Fetcher.Services
 {
-    internal class FetcherService : IFetcherService
+    internal class FetcherService : BackgroundService, IFetcherService
     {
         public FetcherService(IHttpClientService httpClientInterface, IExchangeRateRepository exchangeRateRepository)
         {
@@ -20,6 +20,14 @@ namespace ExchangeRates.Fetcher.Services
             foreach (var rate in exchangeRates)
             {
                 await _exchangeRateRepository.SaveExchangeRateAsync(rate);
+            }
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested) {
+                await FetchAndSaveExchangeRatesAsync();
+                await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
             }
         }
     }
