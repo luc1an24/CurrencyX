@@ -2,7 +2,7 @@
 
 namespace ExchangeRates.Fetcher.Interfaces
 {
-    public interface IHttpClientInterface
+    public interface IHttpClientService
     {
         Task<IEnumerable<ExchangeRate>> GetExchangeRatesAsync();
     }
