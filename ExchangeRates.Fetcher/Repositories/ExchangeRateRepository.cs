@@ -1,10 +1,11 @@
-﻿using ExchangeRates.Shared.Interfaces;
+﻿using ExchangeRates.Fetcher.Interfaces;
+using ExchangeRates.Shared.Interfaces;
 using ExchangeRates.Shared.Models;
 using Npgsql;
 
 namespace ExchangeRates.Fetcher.Repositories
 {
-    public class ExchangeRateRepository
+    public class ExchangeRateRepository : IExchangeRateRepository
     {
         public ExchangeRateRepository(IConnectionStrings connectionStrings)
         {
