@@ -2,6 +2,6 @@
 {
     public interface IFetcherService
     {
-        Task FetchAndSaveExchangeRatesAsync();
+        Task FetchAndSaveExchangeRatesAsync(int failCounter);
     }
 }

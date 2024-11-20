@@ -14,14 +14,24 @@ var builder = Host.CreateDefaultBuilder(args)
         var connectionStrings = context.Configuration.GetSection("ConnectionStrings");
         services.AddSingleton<IConnectionStrings>(new ConnectionStrings
         {
-            Postgres = connectionStrings["Postgres"] ?? "",
-            Redis = connectionStrings["Redis"] ?? ""
+            Postgres = connectionStrings["Postgres"] ?? string.Empty,
+            Redis = connectionStrings["Redis"] ?? string.Empty
         });
-        services.Configure<ExternalApiOptions>(context.Configuration.GetSection("ExternalApi"));
+
+        var externalApiOptions = context.Configuration.GetSection("ExternalApi");
+        services.AddSingleton<IExternalApiOptions>(new ExternalApiOptions
+        {
+            Url = externalApiOptions["url"] ?? string.Empty,
+            ApiKey = externalApiOptions["key"] ?? string.Empty
+        });
+
+        services.AddHttpClient();
 
         services.AddTransient<IHttpClientService, HttpClientService>();
         services.AddTransient<IFetcherService, FetcherService>();
-        services.AddTransient<IExchangeRateRepository, ExchangeRateRepository>(); 
+        services.AddTransient<IExchangeRateRepository, ExchangeRateRepository>();
+
+        services.AddHostedService<FetcherService>();
     })
     .Build();
 
