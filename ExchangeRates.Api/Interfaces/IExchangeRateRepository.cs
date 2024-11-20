@@ -6,5 +6,6 @@ namespace ExchangeRates.Api.Interfaces
     {
         Task<IEnumerable<ExchangeRate>> GetExchangeRatesAsync(int page, int pageSize);
         Task<double?> GetLatestExchangeRateAsync(string currencyCode);
+        Task SaveExchangeRateAsync(ExchangeRate exchangeRate);
     }
 }

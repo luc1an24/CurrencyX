@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ExchangeRates.Api.Controllers
 {
+    [Route("api/exchange-rates")]
     [ApiController]
-    [Route("api/v1/[controller]")]
     public class ExchangeRatesController : ControllerBase
     {
         public ExchangeRatesController(IExchangeRateService service)

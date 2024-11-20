@@ -20,7 +20,7 @@ namespace ExchangeRates.Fetcher.Services
         public async Task<IEnumerable<ExchangeRate>> GetExchangeRatesAsync()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, _externalApiOptions.Url);
-            request.Headers.Add("apikey", _externalApiOptions.Url);
+            request.Headers.Add("apikey", _externalApiOptions.ApiKey);
 
             var response = await _httpClient.SendAsync(request);
 
@@ -40,11 +40,5 @@ namespace ExchangeRates.Fetcher.Services
                 Date = DateTimeOffset.UtcNow
             });
         }
-    }
-
-    internal class ExchangeRateResponse
-    {
-        [JsonPropertyName("data")]
-        public Dictionary<string, double>? ExchangeRates { get; set; }
     }
 }

@@ -10,7 +10,37 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("basic", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "basic",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Basic Authorization header using the Basic scheme."
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "basic"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(8080);
+});
 
 builder.Services.AddAuthentication("BasicAuth").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuth", null);
 builder.Services.AddAuthorization(options =>
@@ -24,14 +54,23 @@ builder.Services.AddSingleton<IConnectionStrings>(new ConnectionStrings
     Postgres = connectionStrings["Postgres"] ?? "",
     Redis = connectionStrings["Redis"] ?? ""
 });
-builder.Services.Configure<ExternalApiOptions>(builder.Configuration.GetSection("ExternalApi"));
+
+var externalApiOptions = (builder.Configuration.GetSection("ExternalApi"));
+builder.Services.AddSingleton<IExternalApiOptions>(new ExternalApiOptions
+{
+    Url = externalApiOptions["url"] ?? string.Empty,
+    ApiKey = externalApiOptions["key"] ?? string.Empty
+});
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddSingleton<IExchangeRateRepository>(new ExchangeRateRepository(new ConnectionStrings
 {
     Postgres = connectionStrings["Postgres"] ?? "",
     Redis = connectionStrings["Redis"] ?? ""
 }));
-builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
+
+builder.Services.AddSingleton<IExchangeRateService, ExchangeRateService>();
 
 var app = builder.Build();
 
@@ -42,8 +81,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

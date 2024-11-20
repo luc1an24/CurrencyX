@@ -1,6 +1,9 @@
 ﻿using ExchangeRates.Api.Dto;
 using ExchangeRates.Api.Interfaces;
 using ExchangeRates.Shared.Interfaces;
+using ExchangeRates.Shared.Models;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ExchangeRates.Api.Services
 {
@@ -47,13 +50,36 @@ namespace ExchangeRates.Api.Services
         public async Task RefreshExchangeRates()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, _externalApiOptions.Url);
-            request.Headers.Add("apikey", _externalApiOptions.Url);
+            request.Headers.Add("apikey", _externalApiOptions.ApiKey);
 
             var response = await _httpClient.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
+                throw new Exception($"Failed to fetch exchange rates: {response.StatusCode}");
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var parsedData = JsonSerializer.Deserialize<ExchangeRateResponse>(jsonResponse);
+
+            if (parsedData is null || parsedData.ExchangeRates is null)
+                throw new Exception($"Failed to deserialize response: {jsonResponse}");
+
+            var rates = parsedData.ExchangeRates.Select(rate => new ExchangeRate
             {
-                throw new UnauthorizedAccessException("Failed to refresh data: Authorization failed.");
+                CurrencyCode = rate.Key,
+                Rate = rate.Value,
+                Date = DateTimeOffset.UtcNow
+            });
+
+            foreach (var rate in rates)
+            {
+                try
+                {
+                    await _repository.SaveExchangeRateAsync(rate);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while saving: {ex.Message}");
+                }
             }
         }
     }
