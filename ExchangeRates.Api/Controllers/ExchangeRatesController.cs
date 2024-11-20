@@ -68,5 +68,30 @@ namespace ExchangeRates.Api.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpDelete("delete")]
+        [Authorize(Policy = "RequireAdmin")]
+        public async Task<IActionResult> DeleteExchangeRate(string CurrencyCode)
+        {
+            var exchangeRate = await _service.FindExchangeRateByCode(CurrencyCode);
+            if (exchangeRate == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                await _service.DeleteLatestExchangeRate(CurrencyCode);
+                return Ok($"Exchange rate for {CurrencyCode} deleted successfully.");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized("Authorization failed while deleting data.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

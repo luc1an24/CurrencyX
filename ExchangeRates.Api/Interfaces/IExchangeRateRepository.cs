@@ -5,7 +5,8 @@ namespace ExchangeRates.Api.Interfaces
     public interface IExchangeRateRepository
     {
         Task<IEnumerable<ExchangeRate>> GetExchangeRatesAsync(int page, int pageSize);
-        Task<double?> GetLatestExchangeRateAsync(string currencyCode);
+        Task<ExchangeRate?> GetLatestExchangeRateAsync(string currencyCode);
         Task SaveExchangeRateAsync(ExchangeRate exchangeRate);
+        Task DeleteExchangeRateAsync(string currencyCode);
     }
 }

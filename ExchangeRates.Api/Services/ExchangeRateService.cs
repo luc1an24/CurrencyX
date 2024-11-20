@@ -20,11 +20,11 @@ namespace ExchangeRates.Api.Services
         private readonly IExternalApiOptions _externalApiOptions;
         private readonly HttpClient _httpClient;
 
-        public async Task<IEnumerable<ExchangeRateDto>> GetExchangeRatesAsync(int page, int pageSize)
+        public async Task<IEnumerable<ExchangeRate>> GetExchangeRatesAsync(int page, int pageSize)
         {
             var rates = await _repository.GetExchangeRatesAsync(page, pageSize);
 
-            return rates.Select(rate => new ExchangeRateDto
+            return rates.Select(rate => new ExchangeRate
             {
                 CurrencyCode = rate.CurrencyCode,
                 Rate = rate.Rate,
@@ -44,7 +44,7 @@ namespace ExchangeRates.Api.Services
             if (rate == null)
                 throw new InvalidOperationException($"Exchange rate for currency '{currencyCode}' not found.");
 
-            return eurValue * rate.Value;
+            return eurValue * rate.Rate;
         }
 
         public async Task RefreshExchangeRates()
@@ -82,6 +82,26 @@ namespace ExchangeRates.Api.Services
                     Console.WriteLine($"Error while saving: {ex.Message}");
                 }
             }
+        }
+
+        public async Task<ExchangeRate> FindExchangeRateByCode(string currencyCode)
+        {
+            if (string.IsNullOrWhiteSpace(currencyCode))
+                throw new ArgumentException("Currency code cannot be null or empty.", nameof(currencyCode));
+
+            var rate = await _repository.GetLatestExchangeRateAsync(currencyCode);
+            if (rate == null)
+                throw new InvalidOperationException($"Exchange rate for currency '{currencyCode}' not found.");
+
+            return rate;
+        }
+
+        public async Task DeleteLatestExchangeRate(string currencyCode)
+        {
+            if (string.IsNullOrWhiteSpace(currencyCode))
+                throw new ArgumentException("Currency code cannot be null or empty.", nameof(currencyCode));
+
+            await _repository.DeleteExchangeRateAsync(currencyCode);
         }
     }
 }

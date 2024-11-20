@@ -45,21 +45,39 @@ namespace ExchangeRates.Api.Repositories
             return rates;
         }
 
-        public async Task<double?> GetLatestExchangeRateAsync(string currencyCode)
+        public async Task<ExchangeRate?> GetLatestExchangeRateAsync(string currencyCode)
         {
             await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
 
-            await using var command = new NpgsqlCommand(@"
-                SELECT Rate
-                FROM ExchangeRates
-                WHERE Currency = @Currency
-                ORDER BY Date DESC
-                LIMIT 1", connection);
-            command.Parameters.AddWithValue("@Currency", currencyCode.ToUpperInvariant());
+            try
+            {
+                await using var command = new NpgsqlCommand(@"
+                    SELECT Currency, Rate, Date
+                    FROM ExchangeRates
+                    WHERE Currency = @Currency
+                    ORDER BY Date DESC
+                    LIMIT 1", connection);
 
-            var rate = await command.ExecuteScalarAsync();
-            return rate == null ? null : Convert.ToDouble(rate);
+                command.Parameters.AddWithValue("@Currency", currencyCode.ToUpperInvariant());
+
+                await using var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    return new ExchangeRate
+                    {
+                        CurrencyCode = reader.GetString(0),
+                        Rate = reader.GetDouble(1),
+                        Date = reader.GetDateTime(2)
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+            }
+
+            return null;
         }
 
         public async Task SaveExchangeRateAsync(ExchangeRate exchangeRate)
@@ -79,6 +97,38 @@ namespace ExchangeRates.Api.Repositories
             command.Parameters.AddWithValue("Date", exchangeRate.Date);
 
             await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task DeleteExchangeRateAsync(string currencyCode)
+        {
+            await using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            try
+            {
+                await using var command = new NpgsqlCommand(@"
+                    DELETE FROM ExchangeRates
+                    WHERE Currency = @Currency
+                    AND Date = (
+                        SELECT MAX(Date)
+                        FROM ExchangeRates
+                        WHERE Currency = @Currency
+                    )", connection);
+
+                command.Parameters.AddWithValue("@Currency", currencyCode.ToUpperInvariant());
+
+                var affectedRows = await command.ExecuteNonQueryAsync();
+
+                if (affectedRows == 0)
+                {
+                    throw new KeyNotFoundException($"Exchange rate for currency '{currencyCode}' not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                throw;
+            }
         }
     }
 }
