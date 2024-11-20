@@ -33,11 +33,12 @@ namespace ExchangeRates.Fetcher.Services
             if (parsedData is null || parsedData.ExchangeRates is null)
                 throw new Exception($"Failed to deserialize response: {jsonResponse}");
 
+            var date = DateTimeOffset.UtcNow;
             return parsedData.ExchangeRates.Select(rate => new ExchangeRate
             {
                 CurrencyCode = rate.Key,
                 Rate = rate.Value,
-                Date = DateTimeOffset.UtcNow
+                Date = date.Date
             });
         }
     }

@@ -68,7 +68,11 @@ namespace ExchangeRates.Api.Repositories
             await connection.OpenAsync();
 
             var command = new NpgsqlCommand(
-                "INSERT INTO ExchangeRates (Currency, Rate, Date) VALUES (@Currency, @Rate, @Date)", connection);
+                "INSERT INTO ExchangeRates (Currency, Rate, Date) " +
+                "SELECT @Currency, @Rate, @Date " +
+                "WHERE NOT EXISTS (" +
+                "SELECT 1 FROM ExchangeRates WHERE Currency = @Currency AND Date = @Date" +
+                ")", connection);
 
             command.Parameters.AddWithValue("Currency", exchangeRate.CurrencyCode);
             command.Parameters.AddWithValue("Rate", exchangeRate.Rate);
