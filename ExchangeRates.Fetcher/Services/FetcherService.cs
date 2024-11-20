@@ -1,4 +1,5 @@
 ﻿using ExchangeRates.Fetcher.Interfaces;
+using System.Data.Common;
 
 namespace ExchangeRates.Fetcher.Services
 {
@@ -23,6 +24,12 @@ namespace ExchangeRates.Fetcher.Services
                 {
                     try
                     {
+                        await _exchangeRateRepository.SaveExchangeRateAsync(rate);
+                    }
+                    catch (DbException dbex)
+                    {
+                        Console.WriteLine($"Error while saving to database: {dbex.Message}");
+                        Thread.Sleep(5 * 1000);
                         await _exchangeRateRepository.SaveExchangeRateAsync(rate);
                     }
                     catch (Exception ex)
