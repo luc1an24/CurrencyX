@@ -3,5 +3,6 @@
     public interface IExternalApiOptions
     {
         string Url { get; set; }
+        string ApiKey { get; set; }
     }
 }
