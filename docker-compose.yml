@@ -17,7 +17,8 @@ services:
     environment:
       - ConnectionStrings__Postgres=Server=postgres;Port=${POSTGRES_PORT};Database=${POSTGRES_DB};User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ConnectionStrings__Redis=${REDIS_HOST}:${REDIS_PORT}
-      - EXTERNAL_API_URL=${EXTERNAL_API_URL}
+      - ExternalApi__Url=${EXTERNAL_API_URL}
+      - ExternalApi__Key=${EXTERNAL_API_KEY}
     depends_on:
       - postgres
       - redis
@@ -29,7 +30,8 @@ services:
     environment:
       - ConnectionStrings__Postgres=Server=postgres;Port=${POSTGRES_PORT};Database=${POSTGRES_DB};User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ConnectionStrings__Redis=${REDIS_HOST}:${REDIS_PORT}
-      - EXTERNAL_API_URL=${EXTERNAL_API_URL}
+      - ExternalApi__Url=${EXTERNAL_API_URL}
+      - ExternalApi__Key=${EXTERNAL_API_KEY}
     depends_on:
       - postgres
       - redis
@@ -49,6 +51,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
 
 networks:
   default:
