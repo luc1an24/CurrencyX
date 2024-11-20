@@ -19,8 +19,10 @@ namespace ExchangeRates.Fetcher.Services
 
         public async Task<IEnumerable<ExchangeRate>> GetExchangeRatesAsync()
         {
-            _httpClient.DefaultRequestHeaders.Add("apikey", _externalApiOptions.ApiKey);
-            var response = await _httpClient.GetAsync(_externalApiOptions.Url);
+            var request = new HttpRequestMessage(HttpMethod.Get, _externalApiOptions.Url);
+            request.Headers.Add("apikey", _externalApiOptions.Url);
+
+            var response = await _httpClient.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception($"Failed to fetch exchange rates: {response.StatusCode}");
@@ -28,7 +30,7 @@ namespace ExchangeRates.Fetcher.Services
             var jsonResponse = await response.Content.ReadAsStringAsync();
             var parsedData = JsonSerializer.Deserialize<ExchangeRateResponse>(jsonResponse);
 
-            if (parsedData is null)
+            if (parsedData is null || parsedData.ExchangeRates is null)
                 throw new Exception($"Failed to deserialize response: {jsonResponse}");
 
             return parsedData.ExchangeRates.Select(rate => new ExchangeRate
@@ -43,6 +45,6 @@ namespace ExchangeRates.Fetcher.Services
     internal class ExchangeRateResponse
     {
         [JsonPropertyName("data")]
-        public Dictionary<string, double> ExchangeRates { get; set; }
+        public Dictionary<string, double>? ExchangeRates { get; set; }
     }
 }
