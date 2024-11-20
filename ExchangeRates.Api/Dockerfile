@@ -16,5 +16,5 @@ RUN dotnet publish ./ExchangeRates.Api/ExchangeRates.Api.csproj -c Release -o /o
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /out .
-EXPOSE 5000
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "ExchangeRates.Api.dll"]
