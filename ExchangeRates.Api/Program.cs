@@ -1,6 +1,5 @@
 using ExchangeRates.Api.Authentication;
 using ExchangeRates.Api.Interfaces;
-using ExchangeRates.Api.Repositories;
 using ExchangeRates.Api.Services;
 using ExchangeRates.Shared.Interfaces;
 using ExchangeRates.Shared.Models;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using ExchangeRates.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +40,7 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "basic"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
@@ -51,10 +51,8 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 });
 
 builder.Services.AddAuthentication("BasicAuth").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuth", null);
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
-});
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
 
 var connectionStrings = builder.Configuration.GetSection("ConnectionStrings");
 builder.Services.AddSingleton<IConnectionStrings>(new ConnectionStrings
@@ -74,7 +72,10 @@ builder.Services.AddSingleton<IExternalApiOptions>(new ExternalApiOptions
 
 builder.Services.AddHttpClient();
 
-builder.Services.AddSingleton<IExchangeRateService, ExchangeRateService>();
+builder.Services.AddScoped<IExchangeRateRepository, ExchangeRateRepository>();
+builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 

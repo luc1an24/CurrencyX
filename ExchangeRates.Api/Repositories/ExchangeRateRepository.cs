@@ -30,7 +30,7 @@ namespace ExchangeRates.Api.Repositories
         public async Task<ExchangeRate?> GetLatestExchangeRateAsync(string currencyCode)
         {
             return await _context.ExchangeRates
-                .Where(e => e.CurrencyCode == currencyCode.ToUpperInvariant())
+                .Where(e => e.CurrencyCode.Equals(currencyCode, StringComparison.InvariantCultureIgnoreCase))
                 .OrderByDescending(e => e.Date)
                 .FirstOrDefaultAsync();
         }
@@ -50,7 +50,7 @@ namespace ExchangeRates.Api.Repositories
         public async Task DeleteExchangeRateAsync(string currencyCode)
         {
             var latestExchangeRate = await _context.ExchangeRates
-                .Where(e => e.CurrencyCode == currencyCode.ToUpperInvariant())
+                .Where(e => e.CurrencyCode.Equals(currencyCode, StringComparison.InvariantCultureIgnoreCase))
                 .OrderByDescending(e => e.Date)
                 .FirstOrDefaultAsync();
 
@@ -63,17 +63,13 @@ namespace ExchangeRates.Api.Repositories
 
         public async Task UpdateExchangeRateAsync(ExchangeRate exchangeRate)
         {
-            var existingRate = await _context.ExchangeRates
-                .FirstOrDefaultAsync(e => e.CurrencyCode == exchangeRate.CurrencyCode && e.Date == exchangeRate.Date);
+            var existingRate = await _context.ExchangeRates.FirstOrDefaultAsync(e => e.CurrencyCode == exchangeRate.CurrencyCode);
 
             if (existingRate == null)
-            {
-                throw new KeyNotFoundException($"Exchange rate for {exchangeRate.CurrencyCode} on {exchangeRate.Date} not found.");
-            }
+                throw new KeyNotFoundException($"Exchange rate for {exchangeRate.CurrencyCode} not found.");
 
-            existingRate.Rate = exchangeRate.Rate;
+            _context.Entry(existingRate).Property(e => e.Rate).IsModified = true;
 
-            _context.ExchangeRates.Update(existingRate);
             await _context.SaveChangesAsync();
         }
 
@@ -83,7 +79,7 @@ namespace ExchangeRates.Api.Repositories
 
             if (!string.IsNullOrEmpty(currencyCode))
             {
-                query = query.Where(e => e.CurrencyCode == currencyCode.ToUpperInvariant());
+                query = query.Where(e => e.CurrencyCode.Equals(currencyCode, StringComparison.InvariantCultureIgnoreCase));
             }
 
             if (date.HasValue)

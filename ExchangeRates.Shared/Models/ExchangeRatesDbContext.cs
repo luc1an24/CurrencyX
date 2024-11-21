@@ -15,11 +15,23 @@ namespace ExchangeRates.Shared.Models
 
             modelBuilder.Entity<ExchangeRate>()
                 .Property(e => e.CurrencyCode)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnName("currencycode");
 
             modelBuilder.Entity<ExchangeRate>()
                 .Property(e => e.Date)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnName("date")
+                .HasConversion(
+                    v => v.ToUniversalTime(),
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+                );
+
+            modelBuilder.Entity<ExchangeRate>()
+                .Property(e => e.Rate)
+                .HasColumnName("rate");
+
+            modelBuilder.Entity<ExchangeRate>().ToTable("exchangerates");
         }
     }
 }

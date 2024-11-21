@@ -10,10 +10,6 @@ namespace ExchangeRates.Api.Validation
             RuleFor(x => x.Rate)
                 .GreaterThan(0)
                 .WithMessage("Rate must be greater than zero.");
-
-            RuleFor(x => x.Date)
-                .LessThanOrEqualTo(DateTime.UtcNow)
-                .WithMessage("Date cannot be in the future.");
         }
     }
 }
