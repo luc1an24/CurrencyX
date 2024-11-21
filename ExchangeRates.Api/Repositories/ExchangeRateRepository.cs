@@ -1,134 +1,97 @@
 ﻿using ExchangeRates.Api.Interfaces;
-using ExchangeRates.Shared.Interfaces;
 using ExchangeRates.Shared.Models;
-using Npgsql;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExchangeRates.Api.Repositories
 {
     public class ExchangeRateRepository : IExchangeRateRepository
     {
-        public ExchangeRateRepository(IConnectionStrings connectionStrings)
+        public ExchangeRateRepository(ExchangeRatesDbContext context)
         {
-            _connectionString = connectionStrings.Postgres;
+            _context = context;
         }
 
-        private readonly string _connectionString;
+        private readonly ExchangeRatesDbContext _context;
 
-        public async Task<IEnumerable<ExchangeRate>> GetExchangeRatesAsync(int page, int pageSize)
+        public async Task<int> GetTotalExchangeRateCountAsync()
         {
-            var rates = new List<ExchangeRate>();
+            return await _context.ExchangeRates.CountAsync();
 
-            await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            var offset = (page - 1) * pageSize;
-            var command = new NpgsqlCommand(@"
-                SELECT DISTINCT ON (Currency) Currency, Rate, Date 
-                FROM ExchangeRates 
-                ORDER BY Currency, Date DESC
-                LIMIT @Limit OFFSET @Offset", connection);
-
-            command.Parameters.AddWithValue("@Limit", pageSize);
-            command.Parameters.AddWithValue("@Offset", offset);
-
-            await using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                rates.Add(new ExchangeRate
-                {
-                    CurrencyCode = reader.GetString(0),
-                    Rate = reader.GetDouble(1),
-                    Date = reader.GetDateTime(2)
-                });
-            }
-
-            return rates;
+        }
+        public async Task<IEnumerable<ExchangeRate>> GetExchangeRatesPagedAsync(int page, int pageSize)
+        {
+            return await _context.ExchangeRates
+                .OrderByDescending(e => e.Date)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public async Task<ExchangeRate?> GetLatestExchangeRateAsync(string currencyCode)
         {
-            await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            try
-            {
-                await using var command = new NpgsqlCommand(@"
-                    SELECT Currency, Rate, Date
-                    FROM ExchangeRates
-                    WHERE Currency = @Currency
-                    ORDER BY Date DESC
-                    LIMIT 1", connection);
-
-                command.Parameters.AddWithValue("@Currency", currencyCode.ToUpperInvariant());
-
-                await using var reader = await command.ExecuteReaderAsync();
-                if (await reader.ReadAsync())
-                {
-                    return new ExchangeRate
-                    {
-                        CurrencyCode = reader.GetString(0),
-                        Rate = reader.GetDouble(1),
-                        Date = reader.GetDateTime(2)
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-            }
-
-            return null;
+            return await _context.ExchangeRates
+                .Where(e => e.CurrencyCode == currencyCode.ToUpperInvariant())
+                .OrderByDescending(e => e.Date)
+                .FirstOrDefaultAsync();
         }
 
         public async Task SaveExchangeRateAsync(ExchangeRate exchangeRate)
         {
-            await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            var exists = await _context.ExchangeRates
+                .AnyAsync(e => e.CurrencyCode == exchangeRate.CurrencyCode && e.Date == exchangeRate.Date);
 
-            var command = new NpgsqlCommand(
-                "INSERT INTO ExchangeRates (Currency, Rate, Date) " +
-                "SELECT @Currency, @Rate, @Date " +
-                "WHERE NOT EXISTS (" +
-                "SELECT 1 FROM ExchangeRates WHERE Currency = @Currency AND Date = @Date" +
-                ")", connection);
-
-            command.Parameters.AddWithValue("Currency", exchangeRate.CurrencyCode);
-            command.Parameters.AddWithValue("Rate", exchangeRate.Rate);
-            command.Parameters.AddWithValue("Date", exchangeRate.Date);
-
-            await command.ExecuteNonQueryAsync();
+            if (!exists)
+            {
+                _context.ExchangeRates.Add(exchangeRate);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteExchangeRateAsync(string currencyCode)
         {
-            await using var connection = new NpgsqlConnection(_connectionString);
-            await connection.OpenAsync();
+            var latestExchangeRate = await _context.ExchangeRates
+                .Where(e => e.CurrencyCode == currencyCode.ToUpperInvariant())
+                .OrderByDescending(e => e.Date)
+                .FirstOrDefaultAsync();
 
-            try
+            if (latestExchangeRate == null)
+                throw new KeyNotFoundException($"Exchange rate for currency '{currencyCode}' not found.");
+
+            _context.ExchangeRates.Remove(latestExchangeRate);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateExchangeRateAsync(ExchangeRate exchangeRate)
+        {
+            var existingRate = await _context.ExchangeRates
+                .FirstOrDefaultAsync(e => e.CurrencyCode == exchangeRate.CurrencyCode && e.Date == exchangeRate.Date);
+
+            if (existingRate == null)
             {
-                await using var command = new NpgsqlCommand(@"
-                    DELETE FROM ExchangeRates
-                    WHERE Currency = @Currency
-                    AND Date = (
-                        SELECT MAX(Date)
-                        FROM ExchangeRates
-                        WHERE Currency = @Currency
-                    )", connection);
-
-                command.Parameters.AddWithValue("@Currency", currencyCode.ToUpperInvariant());
-
-                var affectedRows = await command.ExecuteNonQueryAsync();
-
-                if (affectedRows == 0)
-                {
-                    throw new KeyNotFoundException($"Exchange rate for currency '{currencyCode}' not found.");
-                }
+                throw new KeyNotFoundException($"Exchange rate for {exchangeRate.CurrencyCode} on {exchangeRate.Date} not found.");
             }
-            catch (Exception ex)
+
+            existingRate.Rate = exchangeRate.Rate;
+
+            _context.ExchangeRates.Update(existingRate);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<ExchangeRate>> SearchExchangeRatesAsync(string? currencyCode, DateTime? date)
+        {
+            var query = _context.ExchangeRates.AsQueryable();
+
+            if (!string.IsNullOrEmpty(currencyCode))
             {
-                Console.Error.WriteLine(ex.Message);
-                throw;
+                query = query.Where(e => e.CurrencyCode == currencyCode.ToUpperInvariant());
             }
+
+            if (date.HasValue)
+            {
+                query = query.Where(e => e.Date.Date == date.Value.Date);
+            }
+
+            return await query.ToListAsync();
         }
     }
 }

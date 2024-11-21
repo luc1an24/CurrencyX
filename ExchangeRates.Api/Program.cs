@@ -6,9 +6,17 @@ using ExchangeRates.Shared.Interfaces;
 using ExchangeRates.Shared.Models;
 using Microsoft.AspNetCore.Authentication;
 
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -55,6 +63,8 @@ builder.Services.AddSingleton<IConnectionStrings>(new ConnectionStrings
     Redis = connectionStrings["Redis"] ?? ""
 });
 
+builder.Services.AddDbContext<ExchangeRatesDbContext>(options => options.UseNpgsql(connectionStrings["Postgres"]));
+
 var externalApiOptions = (builder.Configuration.GetSection("ExternalApi"));
 builder.Services.AddSingleton<IExternalApiOptions>(new ExternalApiOptions
 {
@@ -63,12 +73,6 @@ builder.Services.AddSingleton<IExternalApiOptions>(new ExternalApiOptions
 });
 
 builder.Services.AddHttpClient();
-
-builder.Services.AddSingleton<IExchangeRateRepository>(new ExchangeRateRepository(new ConnectionStrings
-{
-    Postgres = connectionStrings["Postgres"] ?? "",
-    Redis = connectionStrings["Redis"] ?? ""
-}));
 
 builder.Services.AddSingleton<IExchangeRateService, ExchangeRateService>();
 

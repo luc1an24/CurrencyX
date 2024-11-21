@@ -1,4 +1,6 @@
-﻿using ExchangeRates.Api.Interfaces;
+﻿using ExchangeRates.Api.Dto;
+using ExchangeRates.Api.Interfaces;
+using ExchangeRates.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,9 +28,7 @@ namespace ExchangeRates.Api.Controllers
             }
             catch (Exception ex)
             {
-                {
-                    return StatusCode(500, ex.Message);
-                }
+                return StatusCode(500, ex.Message);
             }
         }
         
@@ -71,9 +71,12 @@ namespace ExchangeRates.Api.Controllers
 
         [HttpDelete("delete")]
         [Authorize(Policy = "RequireAdmin")]
-        public async Task<IActionResult> DeleteExchangeRate(string CurrencyCode)
+        public async Task<IActionResult> DeleteExchangeRate(string currencyCode)
         {
-            var exchangeRate = await _service.FindExchangeRateByCode(CurrencyCode);
+            if (currencyCode == null || currencyCode.Length != 3)
+                return BadRequest("Invalid parameters.");
+
+            var exchangeRate = await _service.FindExchangeRateByCode(currencyCode);
             if (exchangeRate == null)
             {
                 return NotFound();
@@ -81,8 +84,8 @@ namespace ExchangeRates.Api.Controllers
 
             try
             {
-                await _service.DeleteLatestExchangeRate(CurrencyCode);
-                return Ok($"Exchange rate for {CurrencyCode} deleted successfully.");
+                await _service.DeleteLatestExchangeRate(currencyCode);
+                return Ok($"Exchange rate for {currencyCode} deleted successfully.");
             }
             catch (UnauthorizedAccessException)
             {
@@ -92,6 +95,50 @@ namespace ExchangeRates.Api.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "RequireAdmin")]
+        public async Task<IActionResult> CreateExchangeRate([FromBody] ExchangeRateCreateDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                await _service.CreateExchangeRateAsync(dto);
+                return CreatedAtAction(nameof(GetExchangeRates), new { dto.CurrencyCode }, dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPut("{currencyCode}")]
+        [Authorize(Policy = "RequireAdmin")]
+        public async Task<IActionResult> UpdateExchangeRate(string currencyCode, [FromBody] ExchangeRateUpdateDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var updated = await _service.UpdateExchangeRateAsync(currencyCode, dto);
+                if (!updated)
+                    return NotFound($"Exchange rate with currency code {currencyCode} not found.");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("search")]
+        [Authorize]
+        public async Task<IActionResult> SearchExchangeRates([FromQuery] ExchangeRateSearchDto searchParams)
+        {
+            var results = await _service.SearchExchangeRatesAsync(searchParams.CurrencyCode, searchParams.Date);
+            return Ok(results);
         }
     }
 }
