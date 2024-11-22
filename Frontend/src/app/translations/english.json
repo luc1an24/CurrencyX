@@ -1,0 +1,10 @@
+{
+    "SEARCH": "Search",
+    "CLOSE": "Close",
+    "USERNAME": "Username",
+    "PASSWORD": "Password",
+    "USERNAME_REQUIRED": "Username is required",
+    "PASSWORD_REQUIRED": "Password is required",
+    "LOGIN": "Login",
+    "LOGOUT": "Logout"
+}

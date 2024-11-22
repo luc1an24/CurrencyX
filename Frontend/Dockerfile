@@ -1,13 +1,12 @@
-# Stage 1: Build Angular application
 FROM node:18 AS build
 WORKDIR /app
-COPY ./package.json ./package-lock.json ./
+COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build
+RUN npm run build --prod
 
-# Stage 2: Serve Angular with Nginx
 FROM nginx:alpine
-COPY --from=build /app/dist/exchange-rates /usr/share/nginx/html
-EXPOSE 80
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist/exchange-rates/browser /usr/share/nginx/html
+EXPOSE 80 4200
 CMD ["nginx", "-g", "daemon off;"]

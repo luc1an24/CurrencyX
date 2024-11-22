@@ -1,0 +1,19 @@
+<div>
+    <h2>Exchange Rates</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Currency Code</th>
+                <th>Rate</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let rate of exchangeRates">
+                <td>{{ rate.currencyCode }}</td>
+                <td>{{ rate.rate }}</td>
+                <td>{{ rate.date | date }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
