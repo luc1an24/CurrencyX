@@ -30,7 +30,7 @@ namespace ExchangeRates.Api.Repositories
         public async Task<ExchangeRate?> GetLatestExchangeRateAsync(string currencyCode)
         {
             return await _context.ExchangeRates
-                .Where(e => e.CurrencyCode.Equals(currencyCode, StringComparison.InvariantCultureIgnoreCase))
+                .Where(e => e.CurrencyCode.ToUpper() == currencyCode.ToUpper())
                 .OrderByDescending(e => e.Date)
                 .FirstOrDefaultAsync();
         }
@@ -50,7 +50,7 @@ namespace ExchangeRates.Api.Repositories
         public async Task DeleteExchangeRateAsync(string currencyCode)
         {
             var latestExchangeRate = await _context.ExchangeRates
-                .Where(e => e.CurrencyCode.Equals(currencyCode, StringComparison.InvariantCultureIgnoreCase))
+                .Where(e => e.CurrencyCode.ToUpper() == currencyCode.ToUpper())
                 .OrderByDescending(e => e.Date)
                 .FirstOrDefaultAsync();
 
@@ -79,7 +79,7 @@ namespace ExchangeRates.Api.Repositories
 
             if (!string.IsNullOrEmpty(currencyCode))
             {
-                query = query.Where(e => e.CurrencyCode.Equals(currencyCode, StringComparison.InvariantCultureIgnoreCase));
+                query = query.Where(e => e.CurrencyCode.ToUpper() == currencyCode.ToUpper());
             }
 
             if (date.HasValue)
