@@ -1,6 +1,6 @@
-﻿namespace ExchangeRates.Shared.Models
+﻿namespace ExchangeRates.Api.Dto
 {
-    public class ExchangeRate
+    public class ExchangeRateDto
     {
         public string CurrencyCode { get; set; } = string.Empty;
         public double Rate { get; set; }

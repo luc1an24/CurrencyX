@@ -19,9 +19,10 @@ services:
     environment:
       - ConnectionStrings__Postgres=Server=postgres;Port=${POSTGRES_PORT};Database=${POSTGRES_DB};User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ConnectionStrings__Redis=${REDIS_HOST}:${REDIS_PORT}
-      - ExternalApi_Url=${EXTERNAL_API_URL}
-      - ExternalApi_Key=${EXTERNAL_API_KEY}
+      - ExternalApi__Url=${EXTERNAL_API_URL}
+      - ExternalApi__Key=${EXTERNAL_API_KEY}
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
     depends_on:
       - postgres
       - redis
@@ -37,9 +38,8 @@ services:
     environment:
       - ConnectionStrings__Postgres=Server=postgres;Port=${POSTGRES_PORT};Database=${POSTGRES_DB};User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
       - ConnectionStrings__Redis=${REDIS_HOST}:${REDIS_PORT}
-      - ExternalApi_Url=${EXTERNAL_API_URL}
-      - ExternalApi_Key=${EXTERNAL_API_KEY}
-      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ExternalApi__Url=${EXTERNAL_API_URL}
+      - ExternalApi__Key=${EXTERNAL_API_KEY}
     depends_on:
       - postgres
       - redis

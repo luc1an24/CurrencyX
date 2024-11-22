@@ -1,6 +1,0 @@
-@ExchangeRates.Api_HostAddress = http://localhost:5135
-
-GET {{ExchangeRates.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

@@ -20,9 +20,13 @@ namespace ExchangeRates.Fetcher.Repositories
             await connection.OpenAsync();
 
             var command = new NpgsqlCommand(
-                "INSERT INTO ExchangeRates (Currency, Rate, Date) VALUES (@Currency, @Rate, @Date)", connection);
+                "INSERT INTO ExchangeRates (CurrencyCode, Rate, Date) " +
+                "SELECT @CurrencyCode, @Rate, @Date " +
+                "WHERE NOT EXISTS (" +
+                "SELECT 1 FROM ExchangeRates WHERE CurrencyCode = @CurrencyCode AND Date = @Date" +
+                ")", connection);
 
-            command.Parameters.AddWithValue("Currency", exchangeRate.CurrencyCode);
+            command.Parameters.AddWithValue("CurrencyCode", exchangeRate.CurrencyCode);
             command.Parameters.AddWithValue("Rate", exchangeRate.Rate);
             command.Parameters.AddWithValue("Date", exchangeRate.Date);
 
