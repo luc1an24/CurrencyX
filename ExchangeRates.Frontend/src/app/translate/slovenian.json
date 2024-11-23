@@ -1,0 +1,15 @@
+{
+  "USERNAME": "Uporabniško ime",
+  "PASSWORD": "Geslo",
+  "LOGIN": "Prijava",
+  "LOGOUT": "Odjava",
+  "SEARCH": "Išči",
+  "EXCHANGE_RATES": "Menjalni tečaji",
+  "CURRENCY_CONVERTER": "Pretvornik valut",
+  "CONVERT": "Pretvori",
+  "CONVERTED_AMOUNT": "Pretvorjena količina",
+  "CURRENCY_CODE": "Koda valute",
+  "RATE": "Tečaj",
+  "DATE": "Datum",
+  "RESULTS": "Rezultati"
+}

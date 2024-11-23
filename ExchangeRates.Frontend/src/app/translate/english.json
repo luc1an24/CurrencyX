@@ -1,0 +1,15 @@
+{
+  "USERNAME": "Username",
+  "PASSWORD": "Password",
+  "LOGIN": "Login",
+  "LOGOUT": "Logout",
+  "SEARCH": "Search",
+  "EXCHANGE_RATES": "Exchange rates",
+  "CURRENCY_CONVERTER": "Currency converter",
+  "CONVERT": "Convert",
+  "CONVERTED_AMOUNT": "Converted amount",
+  "CURRENCY_CODE": "Currency code",
+  "RATE": "Rate",
+  "DATE": "Date",
+  "RESULTS": "Results"
+}

@@ -1,0 +1,54 @@
+<div class="logout-section">
+  <div (click)="logout()">
+    <button class="btn logout-btn">{{ 'LOGOUT' | translate }}</button>
+  </div>
+</div>
+
+<div class="search-section">
+  <h2>{{ 'SEARCH' | translate }}</h2>
+  <form (ngSubmit)="search()" class="search-form">
+    <input type="text" class="input-text" placeholder="{{ 'CURRENCY_CODE' | translate }}" [(ngModel)]="currencyCode" name="currencyCode" required />
+    <input type="date" class="input-date" [(ngModel)]="date" name="date" />
+    <button type="submit" class="btn search-btn">{{ 'SEARCH' | translate }}</button>
+  </form>
+  <div *ngIf="searchResults.length > 0" class="search-results">
+    <h3>{{ 'RESULTS' | translate }}:</h3>
+    <ul>
+      <li *ngFor="let result of searchResults" class="result-item">
+        {{ result.currencyCode }} - {{ result.rate }} ({{ result.date | date }})
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="rates-section">
+  <h2>{{ 'EXCHANGE_RATES' | translate }}</h2>
+  <table class="rates-table">
+    <thead>
+      <tr>
+        <th>{{ 'CURRENCY_CODE' | translate }}</th>
+        <th>{{ 'RATE' | translate }}</th>
+        <th>{{ 'DATE' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let rate of exchangeRates" class="rate-row">
+        <td>{{ rate.currencyCode }}</td>
+        <td>{{ rate.rate }}</td>
+        <td>{{ rate.date | date }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="converter-section">
+  <h2>{{ 'CURRENCY_CONVERTER' | translate }}</h2>
+  <form (ngSubmit)="convert()" class="converter-form">
+    <input type="text" class="input-text" placeholder="To Currency" [(ngModel)]="toCurrency" name="toCurrency" required />
+    <input type="number" class="input-number" placeholder="Amount" [(ngModel)]="amount" name="amount" required />
+    <button type="submit" class="btn convert-btn">{{ 'CONVERT' | translate }}</button>
+  </form>
+  <div *ngIf="convertedAmount !== null" class="converted-amount">
+    <h3>{{ 'CONVERTED_AMOUNT' | translate }}: {{ convertedAmount }}</h3>
+  </div>
+</div>
