@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { AuthService } from './auth.service';
 import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
@@ -8,15 +7,13 @@ import { jwtDecode } from 'jwt-decode';
 export class RoleService {
   private role: string | null = null;
 
-  constructor(private authService: AuthService) {}
-
   setRole(role: string): void {
     this.role = role;
   }
 
   getRole(): string | null {
     if (this.role == null) {
-      const token = this.authService.getToken();
+      const token = localStorage.getItem('token');;
       if (token == null)
         return null;
 
