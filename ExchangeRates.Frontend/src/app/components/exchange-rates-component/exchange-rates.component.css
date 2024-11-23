@@ -1,0 +1,122 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    color: #333;
+  }
+  
+  h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #007bff;
+  }
+  
+  /* Buttons */
+  .btn {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .logout-btn {
+    margin-bottom: 20px;
+  }
+  
+  .search-btn,
+  .convert-btn {
+    margin-top: 10px;
+  }
+  
+  /* Inputs */
+  .input-text,
+  .input-date,
+  .input-number {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: calc(100% - 22px);
+    box-sizing: border-box;
+  }
+  
+  /* Sections */
+  .logout-section,
+  .search-section,
+  .rates-section,
+  .converter-section {
+    margin-bottom: 30px;
+  }
+  
+  /* Forms */
+  .search-form,
+  .converter-form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+  }
+  
+  .search-form .input-text,
+  .converter-form .input-text,
+  .converter-form .input-number {
+    width: 100%;
+  }
+  
+  /* Tables */
+  .rates-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .rates-table th,
+  .rates-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .rates-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .rate-row:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  /* Search Results */
+  .search-results {
+    margin-top: 20px;
+  }
+  
+  .search-results ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .result-item {
+    background-color: #f9f9f9;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  /* Converted Amount */
+  .converted-amount {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #28a745;
+  }
+  

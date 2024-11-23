@@ -1,8 +1,0 @@
-{
-    "USERNAME": "Uporabniško ime",
-    "PASSWORD": "Geslo",
-    "USERNAME_REQUIRED": "Uporabniško ime je obvezno",
-    "PASSWORD_REQUIRED": "Geslo je obvezno",
-    "LOGIN": "Prijava",
-    "LOGOUT": "Odjava"
-}

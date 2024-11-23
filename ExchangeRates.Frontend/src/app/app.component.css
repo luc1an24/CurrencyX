@@ -1,0 +1,25 @@
+.language-toggle {
+  display: flex;
+  gap: 10px; /* Space between buttons */
+  justify-content: center; /* Center align the buttons */
+  margin: 20px 0; /* Add some vertical spacing */
+}
+
+.language-toggle button {
+  padding: 10px 20px; /* Button padding for a comfortable size */
+  border: 1px solid #ccc; /* Light border */
+  border-radius: 5px; /* Rounded corners */
+  background-color: #f9f9f9; /* Light background */
+  color: #333; /* Dark text color */
+  font-size: 16px; /* Font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+}
+
+.language-toggle button:hover {
+  background-color: #e0e0e0; /* Slightly darker background on hover */
+}
+
+.language-toggle button:active {
+  background-color: #d0d0d0; /* Even darker background when clicked */
+}
