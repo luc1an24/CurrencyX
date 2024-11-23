@@ -67,7 +67,11 @@ services:
       - default
     volumes:
       - ./DatabaseInitialization:/docker-entrypoint-initdb.d:ro
+      - postgres_data:/var/lib/postgresql/data
 
 networks:
   default:
     driver: bridge
+
+volumes:
+  postgres_data:
