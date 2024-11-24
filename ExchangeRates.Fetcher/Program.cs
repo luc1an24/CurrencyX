@@ -3,6 +3,7 @@ using ExchangeRates.Fetcher.Repositories;
 using ExchangeRates.Fetcher.Services;
 using ExchangeRates.Shared.Interfaces;
 using ExchangeRates.Shared.Models;
+using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((context, config) =>
@@ -17,6 +18,8 @@ var builder = Host.CreateDefaultBuilder(args)
             Postgres = connectionStrings["Postgres"] ?? string.Empty,
             Redis = connectionStrings["Redis"] ?? string.Empty
         });
+
+        services.AddDbContext<ExchangeRatesDbContext>(options => options.UseNpgsql(connectionStrings["Postgres"]));
 
         var externalApiOptions = context.Configuration.GetSection("ExternalApi");
         services.AddSingleton<IExternalApiOptions>(new ExternalApiOptions
