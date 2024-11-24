@@ -10,6 +10,7 @@ using ExchangeRates.Api.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,6 +97,12 @@ builder.Services.AddSingleton<IConnectionStrings>(new ConnectionStrings
 });
 
 builder.Services.AddDbContext<ExchangeRatesDbContext>(options => options.UseNpgsql(connectionStrings["Postgres"]));
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    return ConnectionMultiplexer.Connect(connectionStrings["Redis"] ?? "");
+});
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
 var externalApiOptions = (builder.Configuration.GetSection("ExternalApi"));
 builder.Services.AddSingleton<IExternalApiOptions>(new ExternalApiOptions
