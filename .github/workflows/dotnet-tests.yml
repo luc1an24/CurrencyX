@@ -27,5 +27,14 @@ jobs:
       - name: Build the solution
         run: dotnet build --no-restore --configuration Release
 
-      - name: Run tests
-        run: dotnet test ./tests --no-build --verbosity normal
+      - name: List project files
+        run: |
+          ls -R
+
+      - name: Run tests for ExchangeRatesControllerTests
+        run: |
+          dotnet test ./ExchangeRates.Api/Tests/ExchangeRatesControllerTests.cs --no-build --verbosity normal
+
+      - name: Run tests for ExchangeRateServiceTests
+        run: |
+          dotnet test ./ExchangeRates.Api/Tests/ExchangeRateServiceTests.cs --no-build --verbosity normal
