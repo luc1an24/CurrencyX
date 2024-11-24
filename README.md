@@ -36,5 +36,11 @@ Before you begin, make sure that the following tools are installed on your local
 4. **Verify the Services**:
    Once the services are up, verify that they are running correctly. Navigate to application webpage: [http://localhost:4200](http://localhost:4200).
 
-Login with admin privileges is user:password
-You can access demo on: http://188.230.164.132:4200/
+### Login Information
+
+Login with admin privileges:
+
+**User**: `user`  
+**Password**: `password`
+
+You can access the demo here: [http://188.230.164.132:4200/](http://188.230.164.132:4200/)
