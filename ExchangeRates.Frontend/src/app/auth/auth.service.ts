@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
-import { backendUrls } from '../services/backendUrls';
+import { backendUrls } from '../environment/backendUrls';
 import { RoleService } from './role.service';
 
 @Injectable({

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { backendUrls } from './backendUrls';
+import { backendUrls } from '../environment/backendUrls';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable({
@@ -15,10 +15,7 @@ export class ExchangeRatesService {
   getAllExchangeRates(page: number = 1, pageSize: number = 100): Observable<any> {
     let params = new HttpParams().set('page', page).set('pageSize', pageSize);
     
-    const headerToken = this.authService.getHeaderAuthentication();
-    const headers = new HttpHeaders({
-      Authorization: headerToken ?? []
-    });
+    const headers = this.getAuthHeaders();
 
     return this.http.get(`${this.apiUrl}`, { params, headers });
   }
@@ -29,10 +26,7 @@ export class ExchangeRatesService {
       params = params.set('date', date);
     }
 
-    const headerToken = this.authService.getHeaderAuthentication();
-    const headers = new HttpHeaders({
-      Authorization: headerToken ?? []
-    });
+    const headers = this.getAuthHeaders();
 
     return this.http.get(`${this.apiUrl}/search`, { params, headers });
   }
@@ -40,11 +34,20 @@ export class ExchangeRatesService {
   convertCurrency(currencyCode: string, value: number): Observable<any> {
     let params = new HttpParams().set('currencyCode', currencyCode).set('value', value.toString());
 
-    const headerToken = this.authService.getHeaderAuthentication();
-    const headers = new HttpHeaders({
-      Authorization: headerToken ?? []
-    });
+    const headers = this.getAuthHeaders();
 
     return this.http.get(`${this.apiUrl}/calculate`, { params, headers });
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const headerToken = this.authService.getHeaderAuthentication();
+
+    if (!headerToken) {
+      console.warn('No authentication token found!');
+    }
+
+    return new HttpHeaders({
+      Authorization: headerToken ?? []
+    });
   }
 }

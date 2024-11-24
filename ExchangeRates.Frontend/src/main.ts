@@ -8,16 +8,16 @@ import { provideHttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { LanguageService } from './app/translate/language.service';
 
-let language = 'en';
+let locale = 'en';
 if (isPlatformBrowser(PLATFORM_ID)) {
-  language = localStorage.getItem('language') || language;
+  locale = localStorage.getItem('locale') || locale;
 }
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
     provideHttpClient(),
-    { provide: LOCALE_ID, useValue: language },
+    { provide: LOCALE_ID, useValue: locale },
     LanguageService,
     TranslationService,
     { provide: PLATFORM_ID, useValue: 'browser' }
