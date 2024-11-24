@@ -34,4 +34,4 @@ Before you begin, make sure that the following tools are installed on your local
    docker-compose up
 
 4. **Verify the Services**:
-   Once the services are up, verify that they are running correctly. Navigate to application webpage: [http://localhost:8080](http://localhost:8080).
+   Once the services are up, verify that they are running correctly. Navigate to application webpage: [http://localhost:4200](http://localhost:4200).
