@@ -130,6 +130,15 @@ namespace ExchangeRates.Api.Services
                 throw new ArgumentException("Currency code cannot be null or empty.", nameof(currencyCode));
 
             await _repository.DeleteExchangeRateAsync(currencyCode);
+
+            try
+            {
+                await InvalidateExchangeRateCache();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while invalidating cache: {ex.Message}");
+            }
         }
 
         public async Task CreateExchangeRateAsync(ExchangeRateCreateDto exchangeRateCreateDto)
@@ -137,6 +146,15 @@ namespace ExchangeRates.Api.Services
             var exchangeRate = _mapper.Map<ExchangeRate>(exchangeRateCreateDto);
 
             await _repository.SaveExchangeRateAsync(exchangeRate);
+
+            try
+            {
+                await InvalidateExchangeRateCache();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while invalidating cache: {ex.Message}");
+            }
         }
 
         public async Task<bool> UpdateExchangeRateAsync(string currencyCode, ExchangeRateUpdateDto dto)
@@ -147,6 +165,17 @@ namespace ExchangeRates.Api.Services
             try
             {
                 await _repository.UpdateExchangeRateAsync(exchangeRate);
+
+
+                try
+                {
+                    await InvalidateExchangeRateCache();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while invalidating cache: {ex.Message}");
+                }
+
                 return true;
             }
             catch (KeyNotFoundException)
