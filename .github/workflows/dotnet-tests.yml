@@ -31,10 +31,6 @@ jobs:
         run: |
           ls -R
 
-      - name: Run tests for ExchangeRatesControllerTests
-        run: |
-          dotnet test ./ExchangeRates.Api/Tests/ExchangeRatesControllerTests.cs --no-build --verbosity normal
-
-      - name: Run tests for ExchangeRateServiceTests
-        run: |
-          dotnet test ./ExchangeRates.Api/Tests/ExchangeRateServiceTests.cs --no-build --verbosity normal
+      - name: Run tests
+            run: |
+              dotnet test ./ExchangeRates.Api/ExchangeRates.Api.csproj --no-build --verbosity normal
