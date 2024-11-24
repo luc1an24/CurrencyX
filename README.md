@@ -2,22 +2,6 @@
 
 This project utilizes Docker Compose to manage and deploy the application. Below is the complete guide for setting up and running the project on your local machine or deploying it with Docker. 
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Setup Instructions](#setup-instructions)
-- [Running the Application](#running-the-application)
-  - [Start Docker](#start-docker)
-  - [Clone the Repository](#clone-the-repository)
-  - [Run Docker Compose](#run-docker-compose)
-  - [Verify the Services](#verify-the-services)
-  - [Stopping the Services](#stopping-the-services)
-- [Configuration](#configuration)
-- [Docker Compose Commands](#docker-compose-commands)
-- [Troubleshooting](#troubleshooting)
-- [Additional Resources](#additional-resources)
-- [License](#license)
-
 ## Prerequisites
 
 Before you begin, make sure that the following tools are installed on your local machine:
@@ -42,3 +26,12 @@ Before you begin, make sure that the following tools are installed on your local
    ```bash
    git clone https://github.com/luc1an24/CurrencyX.git
    cd CurrencyX
+
+3. **Run Docker Compose**:
+   With Docker running, you can use Docker Compose to start up all the necessary services. To do so, run:
+
+   ```bash
+   docker-compose up
+
+4. **Verify the Services**:
+   Once the services are up, verify that they are running correctly. Navigate to application webpage: [http://localhost:8080](http://localhost:8080).
