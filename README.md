@@ -1,6 +1,6 @@
-# Project Name
+# CurrencyX
 
-This project utilizes Docker Compose to manage and deploy the application. Below is the complete guide for setting up and running the project on your local machine or deploying it with Docker. 
+Project used to track the history of exchange rates (base currency EUR) and to convert EUR to desired currency.
 
 ## Prerequisites
 
