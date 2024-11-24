@@ -1,16 +1,15 @@
 using ExchangeRates.Api.Interfaces;
+using ExchangeRates.Api.Repositories;
 using ExchangeRates.Api.Services;
 using ExchangeRates.Shared.Interfaces;
 using ExchangeRates.Shared.Models;
-
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.EntityFrameworkCore;
-using ExchangeRates.Api.Repositories;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,10 +54,12 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularApp",
+    options.AddPolicy("AllowKnownOriginsOn4200",
         policy =>
         {
-            policy.WithOrigins("http://localhost:4200")
+            policy.WithOrigins(
+                "http://localhost:4200",
+                "http://188.230.164.132:4200")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -84,7 +85,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
-}); 
+});
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
@@ -121,14 +122,13 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAngularApp");
+app.UseCors("AllowKnownOriginsOn4200");
 
 app.UseAuthentication();
 app.UseAuthorization();
