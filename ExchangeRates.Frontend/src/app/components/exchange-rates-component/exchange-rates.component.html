@@ -1,9 +1,4 @@
-<div class="logout-section">
-  <div (click)="logout()">
-    <button class="btn logout-btn">{{ 'LOGOUT' | translate }}</button>
-  </div>
-</div>
-
+<h1>{{ 'BASE_CURRENCY' | translate}}: EUR</h1>
 <div class="search-section">
   <h2>{{ 'SEARCH' | translate }}</h2>
   <form (ngSubmit)="search()" class="search-form">
@@ -44,11 +39,17 @@
 <div class="converter-section">
   <h2>{{ 'CURRENCY_CONVERTER' | translate }}</h2>
   <form (ngSubmit)="convert()" class="converter-form">
-    <input type="text" class="input-text" placeholder="To Currency" [(ngModel)]="toCurrency" name="toCurrency" required />
+    <input type="text" class="input-text" placeholder="{{ 'TO_CURRENCY' | translate }}" [(ngModel)]="toCurrency" name="toCurrency" required />
     <input type="number" class="input-number" placeholder="Amount" [(ngModel)]="amount" name="amount" required />
     <button type="submit" class="btn convert-btn">{{ 'CONVERT' | translate }}</button>
   </form>
   <div *ngIf="convertedAmount !== null" class="converted-amount">
     <h3>{{ 'CONVERTED_AMOUNT' | translate }}: {{ convertedAmount }}</h3>
+  </div>
+</div>
+
+<div class="logout-section">
+  <div (click)="logout()">
+    <button class="btn logout-btn">{{ 'LOGOUT' | translate }}</button>
   </div>
 </div>

@@ -11,5 +11,7 @@
   "CURRENCY_CODE": "Koda valute",
   "RATE": "Tečaj",
   "DATE": "Datum",
-  "RESULTS": "Rezultati"
+  "RESULTS": "Rezultati",
+  "TO_CURRENCY": "V valuto",
+  "BASE_CURRENCY": "Osnovna valuta"
 }

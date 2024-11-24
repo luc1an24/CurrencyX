@@ -11,5 +11,7 @@
   "CURRENCY_CODE": "Currency code",
   "RATE": "Rate",
   "DATE": "Date",
-  "RESULTS": "Results"
+  "RESULTS": "Results",
+  "TO_CURRENCY": "To currency",
+  "BASE_CURRENCY": "Base currency"
 }
