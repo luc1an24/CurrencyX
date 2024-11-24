@@ -32,5 +32,5 @@ jobs:
           ls -R
 
       - name: Run tests
-            run: |
-              dotnet test ./ExchangeRates.Api/ExchangeRates.Api.csproj --no-build --verbosity normal
+        run: |
+          dotnet test ./ExchangeRates.Api/ExchangeRates.Api.csproj --no-build --verbosity normal
