@@ -28,4 +28,4 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test ./ExchangeRates.Api.Tests/ExchangeRates.Api.Tests.csproj --no-build --verbosity normal
+        run: dotnet test ./tests --no-build --verbosity normal
